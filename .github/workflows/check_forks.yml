@@ -1,0 +1,20 @@
+name: Check for new forks
+on:
+  schedule:
+    # At minute 0 past every 3rd hour from 8 through 22.
+    - cron: "0 8-22/3 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "1.17.x"
+      - name: Check for new forks
+        run: "go run cmd/forks/main.go"
