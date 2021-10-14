@@ -16,7 +16,20 @@ import (
 const knownForksPath = "./known-forks.yaml"
 
 type KnownForks struct {
-	Forks map[string]struct{} `yaml:"forks"`
+	Forks       map[string]struct{} `yaml:"-"`
+	SortedForks []string            `yaml:"forks"`
+}
+
+func (k KnownForks) Contains(in string) bool {
+	_, found := k.Forks[in]
+	return found
+}
+
+func (k *KnownForks) AddUnique(in string) {
+	if !k.Contains(in) {
+		k.Forks[in] = struct{}{}
+		k.SortedForks = append(k.SortedForks, in)
+	}
 }
 
 func main() {
@@ -32,14 +45,14 @@ func main() {
 
 func addKnownFork() {
 	forksLit := flag.String("forks-list", "", "Comma separated list of known forks to add")
-	flag.Parse()
+	flag.CommandLine.Parse(os.Args[2:])
 	if forksLit == nil || *forksLit == "" {
 		exitOnError(errors.New("-forks-list flag is required"))
 	}
 
 	forks := getKnownForks()
 	for _, f := range strings.SplitN(*forksLit, ",", 100) {
-		forks.Forks[strings.TrimSpace(f)] = struct{}{}
+		forks.AddUnique(f)
 	}
 
 	storeKnownForks(forks)
@@ -78,8 +91,7 @@ func checkForks() {
 	knownForks := getKnownForks()
 	var unknown []string
 	for _, f := range forks {
-		_, isKnown := knownForks.Forks[f]
-		if isKnown {
+		if knownForks.Contains(f) {
 			continue
 		}
 		unknown = append(unknown, f)
@@ -102,8 +114,15 @@ func getKnownForks() KnownForks {
 	data, err := os.ReadFile(knownForksPath)
 	exitOnError(err)
 
-	knownForks := KnownForks{}
+	knownForks := KnownForks{
+		Forks: map[string]struct{}{},
+	}
 	exitOnError(yaml.Unmarshal(data, &knownForks))
+
+	for _, f := range knownForks.SortedForks {
+		knownForks.Forks[f] = struct{}{}
+	}
+
 	return knownForks
 }
 

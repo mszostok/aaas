@@ -1,39 +1,37 @@
 forks:
-  .github-capact: {}
-  addons: {}
-  brokerapi: {}
-  capact: {}
-  cli: {}
-  client-go: {}
-  community: {}
-  community-1: {}
-  controller-runtime: {}
-  gcp-service-broker: {}
-  go-zglob: {}
-  helm: {}
-  helm-docs: {}
-  helm-operator: {}
-  hub-manifests: {}
-  k3d: {}
-  kubernetes: {}
-  kyma: {}
-  markdownfmt: {}
-  mdsh: {}
-  node-env-configuration: {}
-  octopus: {}
-  org: {}
-  podpreset-crd: {}
-  prometheus-operator: {}
-  Quick-Start-Big-Bang: {}
-  quicktype: {}
-  rafter: {}
-  service-broker-plugins: {}
-  service-catalog: {}
-  service-catalog-tester: {}
-  shelldoc: {}
-  slides: {}
-  utils: {}
-  vimium: {}
-  website: {}
-
-
+- .github-capact
+- addons
+- brokerapi
+- capact
+- cli
+- client-go
+- community
+- community-1
+- controller-runtime
+- gcp-service-broker
+- go-zglob
+- helm
+- helm-docs
+- helm-operator
+- hub-manifests
+- k3d
+- kubernetes
+- kyma
+- markdownfmt
+- mdsh
+- node-env-configuration
+- octopus
+- org
+- podpreset-crd
+- prometheus-operator
+- Quick-Start-Big-Bang
+- quicktype
+- rafter
+- service-broker-plugins
+- service-catalog
+- service-catalog-tester
+- shelldoc
+- slides
+- utils
+- vimium
+- website
