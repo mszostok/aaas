@@ -25,9 +25,9 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Check for new forks
+      - name: Add known forks to YAML list
         run: go run cmd/forks/main.go add -forks-list ${{ github.event.inputs.forks }}
-      - name: Commit report
+      - name: Commit known forks
         run: |
           git config --global user.name 'Mateusz Szostok'
           git config --global user.email 'szostok.mateusz@gmail.com'

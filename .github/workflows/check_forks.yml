@@ -25,4 +25,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Check for new forks
-        run: "go run cmd/forks/main.go check -known-forks-path ./known-forks.yaml"
+        run: "go run cmd/forks/main.go check"
