@@ -2,51 +2,50 @@ package main
 
 import (
 	"context"
-	"github.com/google/go-github/v38/github"
+	"errors"
+	"flag"
+	"fmt"
 	"log"
+	"os"
 	"strings"
+
+	"github.com/goccy/go-yaml"
+	"github.com/google/go-github/v38/github"
 )
 
-var knownForks = map[string]struct{}{
-	".github-capact": {},
-	"addons": {},
-	"brokerapi": {},
-	"capact": {},
-	"cli": {},
-	"client-go": {},
-	"community": {},
-	"community-1": {},
-	"controller-runtime": {},
-	"gcp-service-broker": {},
-	"go-zglob": {},
-	"helm": {},
-	"helm-docs": {},
-	"helm-operator": {},
-	"hub-manifests": {},
-	"k3d": {},
-	"kubernetes": {},
-	"kyma": {},
-	"markdownfmt": {},
-	"mdsh": {},
-	"node-env-configuration": {},
-	"octopus": {},
-	"org": {},
-	"podpreset-crd": {},
-	"prometheus-operator": {},
-	"Quick-Start-Big-Bang": {},
-	"quicktype": {},
-	"rafter": {},
-	"service-broker-plugins": {},
-	"service-catalog": {},
-	"service-catalog-tester": {},
-	"shelldoc": {},
-	"slides": {},
-	"utils": {},
-	"vimium": {},
-	"website": {},
+const knownForksPath = "./known-forks.yaml"
+
+type KnownForks struct {
+	Forks map[string]struct{} `yaml:"forks"`
 }
 
 func main() {
+	switch cmd := os.Args[1]; cmd {
+	case "add":
+		addKnownFork()
+	case "check":
+		checkForks()
+	default:
+		exitOnError(fmt.Errorf("unkown command %v: allowed %s, %s", cmd, "add", "check"))
+	}
+}
+
+func addKnownFork() {
+	forksLit := flag.String("forks-list", "", "Comma separated list of known forks to add")
+	flag.Parse()
+	if forksLit == nil || *forksLit == "" {
+		exitOnError(errors.New("-forks-list flag is required"))
+	}
+
+	forks := getKnownForks()
+	for _, f := range strings.SplitN(*forksLit, ",", 100) {
+		forks.Forks[strings.TrimSpace(f)] = struct{}{}
+	}
+
+	storeKnownForks(forks)
+}
+
+func checkForks() {
 	client := github.NewClient(nil)
 
 	opt := &github.RepositoryListOptions{
@@ -76,9 +75,10 @@ func main() {
 		forks = append(forks, repo.GetName())
 	}
 
+	knownForks := getKnownForks()
 	var unknown []string
 	for _, f := range forks {
-		_, isKnown := knownForks[f]
+		_, isKnown := knownForks.Forks[f]
 		if isKnown {
 			continue
 		}
@@ -96,4 +96,20 @@ func exitOnError(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getKnownForks() KnownForks {
+	data, err := os.ReadFile(knownForksPath)
+	exitOnError(err)
+
+	knownForks := KnownForks{}
+	exitOnError(yaml.Unmarshal(data, &knownForks))
+	return knownForks
+}
+
+func storeKnownForks(knownForks KnownForks) {
+	data, err := yaml.Marshal(knownForks)
+	exitOnError(err)
+
+	exitOnError(os.WriteFile(knownForksPath, data, 0644))
 }
