@@ -1,4 +1,4 @@
-name: Check for new forks
+name: Add known forks
 on:
   workflow_dispatch:
     inputs:
