@@ -1,8 +1,8 @@
 name: Check for new forks
 on:
   schedule:
-    # At minute 0 past every 3rd hour from 8 through 22.
-    - cron: "0 8-22/3 * * *"
+    # Runs at 08:00 UTC every day.
+    - cron: "0 8 * * *"
   workflow_dispatch:
 
 jobs:
