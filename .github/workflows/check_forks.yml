@@ -25,4 +25,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Check for new forks
-        run: "go run cmd/forks/main.go check"
+        id: check
+        run: |
+          go run cmd/forks/main.go check 2> errors.txt || true
+          echo ::set-output name=errors::`cat errors.txt`
+          go run cmd/forks/main.go check
+      - name: Slack Notification
+        if: ${{ always() && steps.check.outputs.errors != 'success' }}
+        uses: rtCamp/action-slack-notify@12e36fc18b0689399306c2e0b3e0f2978b7f1ee7
+        env:
+          SLACK_USERNAME: GitHub Action as a Service
+          SLACK_COLOR: 'red'
+          SLACK_TITLE: 'Message'
+          SLACK_CHANNEL: 'checks'
+          SLACK_MESSAGE: ${{ steps.check.outputs.errors }}
+          SLACK_ICON_EMOJI: ':this-is-fine:'
+          SLACK_FOOTER: "Periodic forks check failed :ahhhhhhhhh:"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_PRIV_WEBHOOK }}
