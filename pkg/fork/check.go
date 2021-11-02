@@ -3,7 +3,6 @@ package fork
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/google/go-github/v38/github"
@@ -66,6 +65,6 @@ func Check() error {
 		}
 	}
 
-	log.Println("All looks good.")
+	fmt.Println("All looks good.")
 	return nil
 }
